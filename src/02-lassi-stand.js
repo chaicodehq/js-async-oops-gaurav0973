@@ -1,7 +1,7 @@
 /**
  * 🥛 Punjab ki Famous Lassi Stand Chain - Constructor Functions & Prototype
  *
- * Punjab ki mashoor lassi stand chain hai jahan har stand pe fresh lassi milti
+ * Punjab ki mashoor lassin stad chain hai jahan har stand pe fresh lassi milti
  * hai. Tumhe constructor function se lassi stands banana hai aur prototype pe
  * methods add karne hain. `new` keyword se har stand ek naya instance banega
  * aur prototype methods sab instances share karenge.
@@ -13,8 +13,8 @@
  *   - this.menu = [] (empty array, flavors will be added)
  *   - this.orders = [] (empty array)
  *   - this._nextOrderId = 1 (internal counter for auto-increment)
- *
- * Prototype Methods (add on LassiStand.prototype):
+ *a
+ * Prototype Methods (add on LssiStand.prototype):
  *
  *   addFlavor(flavor, price)
  *     - Pushes { flavor, price } to this.menu
@@ -73,6 +73,11 @@
  */
 export function LassiStand(name, city) {
   // Your code here
+  this.name = name;
+  this.city = city;
+  this.menu = [];
+  this.orders = [];
+  this._nextOrderId = 1;
 }
 
 // Add prototype methods here:
@@ -81,7 +86,56 @@ export function LassiStand(name, city) {
 // LassiStand.prototype.completeOrder = function(orderId) { ... }
 // LassiStand.prototype.getRevenue = function() { ... }
 // LassiStand.prototype.getMenu = function() { ... }
+LassiStand.prototype.addFlavor = function(flavor, price){
+  if(price <= 0)
+    return -1
+  if(this.menu.some(item => item.flavor === flavor))
+    return -1
+  this.menu.push({ flavor, price })
+  return this.menu.length;
+}
 
+LassiStand.prototype.takeOrder = function(customerName, flavor, quantity){
+  if(!this.menu.some(item => item.flavor === flavor))
+    return -1
+  if(quantity <= 0)
+    return -1;
+  
+  const item = this.menu.find(item => item.flavor === flavor)
+  const totalCost = item.price * quantity;
+  const order = { 
+    id: this._nextOrderId++,
+    customer: customerName,
+    flavor, 
+    quantity, 
+    total: totalCost,
+    status: "pending" 
+  }
+  this.orders.push(order)
+  return order.id;
+}
+
+LassiStand.prototype.completeOrder = function(orderId){
+  const order = this.orders.find(it => it.id === orderId)
+  if(!order) return false;
+  if(order.status === "completed")
+      return false;
+  order.status = "completed";
+  return true;
+}
+
+LassiStand.prototype.getRevenue = function(){
+
+  const completedOrders = this.orders.filter(it => it.status === "completed")
+  let sum = 0;
+  completedOrders.forEach(order => sum+=order.total)
+  return sum;
+}
+
+LassiStand.prototype.getMenu = function(){
+  return this.menu.map(item => ({ ...item }));
+}
 export function isLassiStand(obj) {
   // Your code here
+  return obj instanceof LassiStand;
 }
